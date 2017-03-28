@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Queueing Simulation</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>ECE 461 Mini Project #1</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11774,7 +11774,9 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="ECE-461/561---Mini-Project-#1">ECE 461/561 - Mini Project #1<a class="anchor-link" href="#ECE-461/561---Mini-Project-#1">&#182;</a></h1><h2 id="Two-Transmission-Link-Queueing-System-Simulator-and-Output">Two-Transmission-Link Queueing System Simulator and Output<a class="anchor-link" href="#Two-Transmission-Link-Queueing-System-Simulator-and-Output">&#182;</a></h2><hr>
+<p><strong>Andrew Lubawy, EE</strong></p>
+<p><strong>Due: 3/28/2017</strong></p>
+<h1 id="Two-Transmission-Link-Queueing-System-Simulator-and-Output">Two-Transmission-Link Queueing System Simulator and Output<a class="anchor-link" href="#Two-Transmission-Link-Queueing-System-Simulator-and-Output">&#182;</a></h1><hr>
 <h2 id="Code">Code<a class="anchor-link" href="#Code">&#182;</a></h2>
 </div>
 </div>
@@ -11794,6 +11796,16 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This section of code implements a queue data type for use in my simulation. It can enqueue which adds an item to the back of the queue and is FIFO for dequeueing. Doing it this way closely represents a real queue and lets me easily track objects in the queue.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -11874,6 +11886,17 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This next piece of code performs the actual simulation and keeps track of everything. My method generates some arrival interval according to an exponential distribution with relation to $\lambda$. I then check if the time is 0 to handle an edge case by immediately adding to the queue. To do that I need to generate a uniformly distributed random variable to compare with $\phi$ and determine which queue to use. I then add that arrival time to the queue for use later and to simulate a packet entering. With that out of the way I then go through a series of checks to make sure packets are dequeueing according to exponential service times with relation to $\mu$. If anything should be dequeued I can then check its arrival time that I stored when dequeueing with the current time to determine delay while also incrementing a counter to check the number of packets serviced. Next, I'll have to enqueue whatever arrived after all dequeues finished, if any. When doing this I go through an important check. I will increment a dropped counter if the queue I'm adding to is full which helps me determine blocking. If it successfully queues I can then increment a counter which checks how full the queue is at certain points during the runtime. This counter also decreases during dequeues, and it helps me determine the average number of packets in the queue.</p>
+<p>The latter portion of the code block contains equations and methods to output the expected metrics and the ones simulated in an easily readable format.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -13383,8 +13406,8 @@ A/w7I/8orVTO61GU1746YOGUru17DenQz5fktBHBed03F24zs8KMxqESM7OiuXCbmRXGhdvMrDAu
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <hr>
-<h2 id="Conclusions">Conclusions<a class="anchor-link" href="#Conclusions">&#182;</a></h2><p>The value of $\phi$ has an interesting impact on the system's behavior. As can be seen from the graphs, if $\phi$ is not equal then there is a queue being underutilized with too much runtime spent with too few packets in queue. This affects throughput negatively as can be seen from the expected and simulated results. Buffer size also plays an important role as it changes the probability that a packet will be blocked from entering the queue. An decrease in the buffer size will also negatively impact the throughput as the queue will not be able to utilize the full capability of the service rate.</p>
-<p>From, the results of the simulations the system with a buffer size of 20 and a $\phi$ of 0.5 is the best configuration in terms of throughput. This is obvious from the observed results. A larger buffer will allow better utilization of the service time with fewer blockings happening, and a $\phi$ of 0.5 will make sure a queue is not being underutilized.</p>
+<h2 id="Conclusions">Conclusions<a class="anchor-link" href="#Conclusions">&#182;</a></h2><p>The value of $\phi$ has an interesting impact on the system's behavior. As can be seen from the graphs, if $\phi$ is not equal then there is a queue being underutilized with too much runtime spent with too few packets in queue. This affects throughput negatively as can be seen from the results. Buffer size also plays an important role as it changes the probability that a packet will be blocked from entering the queue. An decrease in the buffer size will also negatively impact the throughput as the queue will not be able to utilize the full capability of the service rate.</p>
+<p>From, the results of the simulations, the system with a buffer size of 20 and a $\phi$ of 0.5 is the best configuration. This is obvious from the observed results especially from the viewpoint of throughput. A larger buffer will allow better utilization of the service time with fewer blockings happening, and a $\phi$ of 0.5 will make sure a queue is not being underutilized. This at first seemed contrary because while this queue has a higher throughput, it's delay was actually worse than the queue with a buffer size of 5. However, that is because the queue can only hold 6 packets. The queue will have less delay because at most there will only be 5 packets ahead of another reducing the delay, but the queue itself is actually unreliable. It will block packets more often and it won't be able to fully utilize its service time the way the size 20 buffer can.</p>
 
 </div>
 </div>
