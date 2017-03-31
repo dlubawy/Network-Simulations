@@ -2,13 +2,13 @@
 # coding: utf-8
 
 # **Andrew Lubawy, EE**
-# 
+#
 # **Due: 3/28/2017**
-# 
+#
 # # Two-Transmission-Link Queueing System Simulator and Output
-# 
+#
 # ***
-# 
+#
 # ## Code
 
 # In[1]:
@@ -29,7 +29,7 @@ from collections import deque
 
 class Queue:
     """A queue for use in simulating M/M/1/k.
-    
+
     Attributes:
         k (int): Maximum customers allowed in the system.
         departures (list): A sample of departure intervals.
@@ -37,7 +37,7 @@ class Queue:
         dropped (int): Number of items dropped because queue was full.
         served (int): Number of items served from queue.
     """
-    
+
     def __init__(self, k, mu, departures):
         """Forms a queue.
 
@@ -53,26 +53,26 @@ class Queue:
         self.queue = deque([], k)
         self.dropped = 0
         self.served = 0
-        
+
     def empty(self):
         """Checks if the queue is empty.
-        
+
         Returns:
             True if empty, False otherwise.
         """
         return len(self.queue) is 0
-    
+
     def is_full(self):
         """Checks if the queue is full.
-        
+
         Returns:
             True if full, False otherwise.
         """
         return len(self.queue) is self.k
-    
+
     def enqueue(self, item):
         """Adds an item to end of the queue.
-        
+
         Args:
             item: An item to add to the queue.
         """
@@ -80,17 +80,17 @@ class Queue:
             self.dropped += 1
         else:
             self.queue.append(item)
-        
+
     def dequeue(self):
         """Removes the fist item from the queue."""
         if not self.empty():
             self.served += 1
             return self.queue.popleft()
         return None
-            
+
     def get_size(self):
         """Get the size of the queue.
-        
+
         Returns:
             An integer for the size of the queue.
         """
@@ -98,15 +98,15 @@ class Queue:
 
 
 # This next piece of code performs the actual simulation and keeps track of everything. My method generates some arrival interval according to an exponential distribution with relation to $\lambda$. I then check if the time is 0 to handle an edge case by immediately adding to the queue. To do that I need to generate a uniformly distributed random variable to compare with $\phi$ and determine which queue to use. I then add that arrival time to the queue for use later and to simulate a packet entering. With that out of the way I then go through a series of checks to make sure packets are dequeueing according to exponential service times with relation to $\mu$. If anything should be dequeued I can then check its arrival time that I stored when dequeueing with the current time to determine delay while also incrementing a counter to check the number of packets serviced. Next, I'll have to enqueue whatever arrived after all dequeues finished, if any. When doing this I go through an important check. I will increment a dropped counter if the queue I'm adding to is full which helps me determine blocking. If it successfully queues I can then increment a counter which checks how full the queue is at certain points during the runtime. This counter also decreases during dequeues, and it helps me determine the average number of packets in the queue.
-# 
-# 
+#
+#
 # The latter portion of the code block contains equations and methods to output the expected metrics and the ones simulated in an easily readable format.
 
 # In[3]:
 
 def simulation(lamb, mu, k, phi, samples):
     """Used to run a simulation of an M/M/1/k network.
-    
+
     Args:
         lamb (float): The rate into the entire network.
         mu (float): The rate out of the two queues in the network.
@@ -143,7 +143,7 @@ def simulation(lamb, mu, k, phi, samples):
             # Dequeues any packets that should have been processed
             # before the next arrival.
             while queue1.departures[i] <= time:
-                t = queue1.dequeue() 
+                t = queue1.dequeue()
                 if t is not None:
                     queue1_time.append(queue1.departures[i] - t)
                 # Sums the intervals to compare with time since arrival.
@@ -152,7 +152,7 @@ def simulation(lamb, mu, k, phi, samples):
                 if queue1.served > 1000:
                     queue1_size.append(queue1.get_size())
             while queue2.departures[j] <= time:
-                t = queue2.dequeue() 
+                t = queue2.dequeue()
                 if t is not None:
                     queue2_time.append(queue2.departures[j] - t)
                 queue2.departures[j+1] += queue2.departures[j]
@@ -171,7 +171,7 @@ def simulation(lamb, mu, k, phi, samples):
                 queue2_size.append(queue2.get_size())
             # Increments time by one arrival interval.
             time += arrivals
-    
+
     # Print the metrics for the queues.
     print_metrics(lamb, mu, k, phi, samples, time,
                   queue1, queue1_arrivals, queue1_size, queue1_time,
@@ -181,7 +181,7 @@ def print_metrics(lamb, mu, k, phi, samples, time,
                   queue1, queue1_arrivals, queue1_size, queue1_time,
                   queue2, queue2_arrivals, queue2_size, queue2_time):
     """Prints the metrics for the system, queue1, and queue2.
-    
+
     Args:
         lamb (float): The rate into the entire network.
         mu (float): The rate out of the two queues in the network.
@@ -200,7 +200,7 @@ def print_metrics(lamb, mu, k, phi, samples, time,
     """
     # Calculate and print results.
     # Queue 1.
-    # Blocking probability. 
+    # Blocking probability.
     e_pb1 = eval_blocking(lamb*phi, mu, k)
     pb1 = queue1.dropped/queue1_arrivals
     # Average delay.
@@ -231,16 +231,16 @@ def print_metrics(lamb, mu, k, phi, samples, time,
     # Blocking probability.
     e_pb = phi*e_pb1 + (1-phi)*e_pb2
     pb = (queue1.dropped+queue2.dropped)/(queue1_arrivals + queue2_arrivals)
-    # Average delay.
-    e_et = phi*e_et1 + (1-phi)*e_et2
-    et = average(queue1_time+queue2_time)
     # Average number of packets in system.
-    e_n = phi*e_n1 + (1-phi)*e_n2
-    n = average(queue1_size+queue2_size)
+    e_n = e_n1 + e_n2
+    n = n1 + n2
+    # Average delay.
+    e_et = e_n/(lamb*(1-e_pb))
+    et = average(queue1_time+queue2_time)
     # Throughput.
-    e_thru = average([e_thru1, e_thru2])
+    e_thru = e_thru1 + e_thru2
     thru = n/et
-    
+
     print("\nSimulation of two M/M/1/{0} queues with phi={1}:\n".format(k,phi))
     # Whole system.
     system_metrics = {'expected_blocking':e_pb, 'blocking':pb, 'expected_delay':e_et, 'delay':et,
@@ -278,7 +278,7 @@ def print_metrics(lamb, mu, k, phi, samples, time,
     print("\t\t\tSimulated: ", n2)
     print("\t\tThroughput in packets/second:\n\t\t\tExpected: ", e_thru2)
     print("\t\t\tSimulated: ", thru2)
-    
+
     f, (ax1, ax2) = subplots(1, 2, sharey=True)
     f.suptitle("Distribution of Packets in Queue as a Factor of Runtime")
     ax1.hist(queue1_size)
@@ -307,7 +307,7 @@ def print_metrics(lamb, mu, k, phi, samples, time,
 
 def eval_blocking(lamb, mu, k):
     """Finds the blocking probability of a queue.
-    
+
     Args:
         lamb (float): The rate into the queue.
         mu (float): The rate out of the queue.
@@ -318,7 +318,7 @@ def eval_blocking(lamb, mu, k):
 
 def eval_delay(lamb, mu, k, pb):
     """Finds the average delay of a queue.
-    
+
     Args:
         lamb (float): The rate into the queue.
         mu (float): The rate out of the queue.
@@ -341,9 +341,9 @@ def eval_delay(lamb, mu, k, pb):
 
 # In[4]:
 
-simulation(8, 5, 21, 0.4, 6000)
-simulation(8, 5, 21, 0.5, 6000)
-simulation(8, 5, 21, 0.6, 6000)
+simulation(8, 5, 21, 0.4, 100000)
+simulation(8, 5, 21, 0.5, 100000)
+simulation(8, 5, 21, 0.6, 100000)
 
 
 # ### Configuration 2:
@@ -355,16 +355,16 @@ simulation(8, 5, 21, 0.6, 6000)
 
 # In[5]:
 
-simulation(8, 5, 6, 0.4, 6000)
-simulation(8, 5, 6, 0.5, 6000)
-simulation(8, 5, 6, 0.6, 6000)
+simulation(8, 5, 6, 0.4, 100000)
+simulation(8, 5, 6, 0.5, 100000)
+simulation(8, 5, 6, 0.6, 100000)
 
 
 # ***
-# 
+#
 # ## Conclusions
-# 
-# The value of $\phi$ has an interesting impact on the system's behavior. As can be seen from the graphs, if $\phi$ is not equal then there is a queue being underutilized with too much runtime spent with too few packets in queue. This affects throughput negatively as can be seen from the results. Buffer size also plays an important role as it changes the probability that a packet will be blocked from entering the queue. An decrease in the buffer size will also negatively impact the throughput as the queue will not be able to utilize the full capability of the service rate.
-# 
-# 
-# From, the results of the simulations, the system with a buffer size of 20 and a $\phi$ of 0.5 is the best configuration. This is obvious from the observed results especially from the viewpoint of throughput. A larger buffer will allow better utilization of the service time with fewer blockings happening, and a $\phi$ of 0.5 will make sure a queue is not being underutilized. This at first seemed contrary because while this queue has a higher throughput, it's delay was actually worse than the queue with a buffer size of 5. However, that is because the queue can only hold 6 packets. The queue will have less delay because at most there will only be 5 packets ahead of another reducing the delay, but the queue itself is actually unreliable. It will block packets more often and it won't be able to fully utilize its service time the way the size 20 buffer can.
+#
+# The value of $\phi$ has an interesting impact on the system's behavior. As can be seen from the graphs, if $\phi$ is not equal then there is a queue being underutilized with too much runtime spent with too few packets in queue. This affects throughput negatively as can be seen from the results. Buffer size also plays an important role as it changes the probability that a packet will be blocked from entering the queue. A decrease in the buffer size will also negatively impact the throughput as the queue will not be able to utilize the full capability of the service rate.
+#
+#
+# From, the results of the simulations, the system with a buffer size of 20 and a $\phi$ of 0.5 is the best configuration. This is obvious from the observed results especially from the viewpoint of throughput. A larger buffer will allow better utilization of the service time with fewer blockings happening, and a $\phi$ of 0.5 will make sure a queue is not being underutilized. This at first seemed contrary because while this queue has a higher throughput, it's delay was actually worse than the queue with a buffer size of 5. However, that is because the queue can only hold 6 packets. The queue will have less delay because at most there will only be 5 packets ahead of another reducing the delay, but the queue itself is actually unreliable because it is blocking more packets. It will block packets more often and it won't be able to fully utilize its service time the way the size 20 buffer can.
