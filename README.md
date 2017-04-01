@@ -2,7 +2,7 @@
 
 ## Two-Transmission-Link Queueing System Simulator and Output
 
-This is a project to simulate a two link M/M/1/k queueing system in various configuration formats. It ouputs various metrics and graphs to help visualize differences in configurations. **Reports for the project in both PDF and HTML types can be found in the `./docs` folder.**
+This is a project to simulate a two link M/M/1/k queueing system in various configuration formats. It outputs various metrics and graphs to help visualize differences in configurations. **Reports for the project in both PDF and HTML types can be found in the `./docs` folder.**
 
 ***
 
@@ -14,7 +14,7 @@ Must have Python3 installed along with the SciPy stack found [here](https://www.
 
 ## Usage
 
-Change directory to where you downloaded the files. Start a Jupyter notebook with the command `jupyter notebook`. This will start a webserver at `localhost:8888`, connect and login following the instructions given. The files should show up in your notebook, if not you can just upload them using the interface. To run the simulation just go to the `*.ipynb` file and run the kernel. Optionally, you may run just the simulation using `jupyter run docs/*.py`. This will run just the simulation code.
+Change directory to where you downloaded the files. Start a Jupyter notebook with the command `jupyter notebook`. This will start a web-server at `localhost:8888`, connect and login following the instructions given. The files should show up in your notebook, if not you can just upload them using the interface. To run the simulation just go to the `*.ipynb` file and run the kernel. Optionally, you may run just the simulation using `jupyter run docs/*.py`. This will run just the simulation code.
 
 ***
 
