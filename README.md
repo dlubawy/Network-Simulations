@@ -1,14 +1,20 @@
-# ECE 461/561 - Mini Project \#1
+# ECE 461/561 - Mini Projects
 
-## Two-Transmission-Link Queueing System Simulator and Output
+## Mini Project \#1: Two-Transmission-Link Queueing System Simulator and Output
 
-This is a project to simulate a two link M/M/1/k queueing system in various configuration formats. It ouputs various metrics and graphs to help visualize differences in configurations. **Reports for the project in both PDF and HTML types can be found in the `./docs` folder.**
+This is a project to simulate a two link M/M/1/k queueing system in various configuration formats. It ouputs various metrics and graphs to help visualize differences in configurations. **Reports for this project in both PDF and HTML format can be found in the `./docs` folder.**
+
+***
+
+## Mini Project \#2: Simulation and Analysis of a Circuit-Switched Optical Network with Wavelength-Division Multiplexing
+
+This is a project to simulate a circuit-switched optical network with wavelength-division multiplexing. It outputs dropping probabilities for various network configurations for comparison. **Reports for this project in both PDF and HTML format can be found in the `./docs` folder.**
 
 ***
 
 ## Installation
 
-Must have Python3 installed along with the SciPy stack found [here](https://www.scipy.org/install.html#installing-via-pip). If those are installed clone the repository: `git clone https://github.com/dlubawy/Queueing-Simulation.git <install directory>`. Replace `<install directory>` with where you want the project.
+Must have Python3 installed along with the SciPy stack found [here](https://www.scipy.org/install.html#installing-via-pip). If those are installed clone the repository: `git clone https://github.com/dlubawy/Network-Simulations.git <install directory>`. Replace `<install directory>` with where you want the project.
 
 ***
 
@@ -20,7 +26,7 @@ Change directory to where you downloaded the files. Start a Jupyter notebook wit
 
 ## License
 
-Two-Transmission-Link Queueing System Simulator and Output
+Network Simulations
 
 Copyright 2017 Andrew Lubawy
 
